@@ -7,7 +7,7 @@ extern crate libuser;
 
 #[no_mangle]
 fn main() -> i32 {
-    println!("???");
+    println!("ebreak test");
     unsafe {
         asm!(
             "ebreak",
