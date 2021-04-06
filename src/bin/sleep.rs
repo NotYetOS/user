@@ -5,8 +5,7 @@
 extern crate libuser;
 
 use libuser::{
-    _yield, 
-    get_pid, 
+    _yield,  
     get_time_ms
 };
 
@@ -17,7 +16,6 @@ fn main() -> i32 {
     while get_time_ms() < wait_for {
         _yield();
     }
-    println!("pid = {}", get_pid());
     println!("Test sleep OK!");
     0
 }
