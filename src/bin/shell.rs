@@ -6,12 +6,12 @@ extern crate libuser;
 extern crate alloc;
 
 use alloc::string::String;
+use libuser::{console::getchar, waitpid};
 use libuser::{
-    console::getchar, 
+    _yield, 
     exec, 
     exit, 
     fork, 
-    waitpid
 };
 
 const LF: u8 = 0x0au8;
@@ -20,7 +20,7 @@ const DL: u8 = 0x7fu8;
 const BS: u8 = 0x08u8;
 
 #[no_mangle]
-fn main() {
+fn main() -> ! {
     print!("-> ~ ");
     let mut line: String = String::new();
 
@@ -43,12 +43,7 @@ fn main() {
                         }
                     } else {
                         let mut exit_code: i32 = 0;
-                        let pid = waitpid(pid, &mut exit_code);
-                        println!(
-                            "Process {} exited with code {}", 
-                            pid, 
-                            exit_code
-                        );
+                        block_wait(pid, &mut exit_code);
                     } 
                     line.clear();
                 }
@@ -70,5 +65,21 @@ fn main() {
                 }
             }
         }
+    }
+}
+
+fn block_wait(pid: isize, exit_code: &mut i32) {
+    loop {
+        match waitpid(pid, exit_code) {
+            -2 => { _yield(); },
+            pid @ _ => { 
+                println!(
+                    "Process {} exited with code {}", 
+                    pid, 
+                    exit_code
+                );
+                break;
+            }
+        };
     }
 }

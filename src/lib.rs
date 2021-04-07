@@ -52,11 +52,9 @@ pub fn _yield() -> isize { sys_yield() }
 pub fn getpid() -> isize { sys_getpid() }
 pub fn fork() -> isize { sys_fork() }
 pub fn exec(path: &str) -> isize { sys_exec(path) }
+pub fn wait(exit_code: &mut i32) -> isize {
+    sys_waitpid(-1, exit_code as *mut _)
+}
 pub fn waitpid(pid: isize, exit_code: &mut i32) -> isize {
-    loop {
-        match sys_waitpid(pid, exit_code as *mut _) {
-            -2 => { _yield(); }
-            exit_pid => return exit_pid,
-        }
-    }
+    sys_waitpid(pid, exit_code as *mut _)
 }
