@@ -33,8 +33,8 @@ macro_rules! println {
     }
 }
 
-pub fn getchar() -> u8 {
-    let mut ch = [0u8; 1];
-    super::read(STDIN, &mut ch);
-    ch[0]
+pub fn get_byte() -> u8 {
+    let mut ch_byte = [0; 1];
+    super::read(STDIN, &mut ch_byte);
+    ch_byte[0]
 }
