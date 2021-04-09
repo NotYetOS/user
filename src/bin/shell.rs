@@ -119,7 +119,7 @@ impl CharBuffer {
     pub fn get_bytes(&mut self) {
         loop {
             let byte = get_byte();
-            if byte != 0 {
+            if byte as i8 != -1 {
                 self.inner.push(byte);
                 break;
             }
@@ -127,7 +127,7 @@ impl CharBuffer {
 
         loop {
             let byte = get_byte();
-            if byte == 0 {
+            if byte as i8 == -1 {
                 break;
             } else {
                 self.inner.push(byte);
