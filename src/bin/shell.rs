@@ -21,59 +21,68 @@ const CR: u8 = 0x0du8;
 const DL: u8 = 0x7fu8;
 const BS: u8 = 0x08u8;
 
+// emm, laji codes, but it works
 #[no_mangle]
 fn main() -> ! {
     print!("-> ~ ");
     let mut line: String = String::new();
     let mut char_buf = CharBuffer::new();
+    
     loop {
         let ch = char_buf.char();
-        match ch as u8 {
-            LF | CR => {
-                println!("");
-                if line.eq("exit") {
-                    exit(0);
-                }
+        if ch.is_ascii() {
+            match ch as u8 {
+                LF | CR => {
+                    println!("");
 
-                if !line.is_empty() {
-                    let pid = fork();
-                    if pid == 0 {
-                        let ret = exec(&line);
-                        if ret == -1 {
-                            println!("{}: command not found", line);
-                            exit(-1);
+                    if line.eq("exit") {
+                        exit(0);
+                    }
+    
+                    if !line.is_empty() {
+                        let pid = fork();
+                        if pid == 0 {
+                            let ret = exec(&line);
+                            if ret == -1 {
+                                println!("{}: command not found", line);
+                                exit(-1);
+                            }
+                        } else {
+                            let mut exit_code: i32 = 0;
+                            block_wait(pid, &mut exit_code);
+                        } 
+                        line.clear();
+                    }
+
+                    print!("-> ~ ");
+                },
+                BS | DL => {
+                    if !line.is_empty() {
+                        let ch = line.pop().unwrap();
+                        if ch.is_ascii() {
+                            print!("{}", BS as char);
+                            print!(" ");
+                            print!("{}", BS as char);
+                        } else {
+                            print!("{}", BS as char);
+                            print!("{}", BS as char);
+                            print!(" ");
+                            print!(" ");
+                            print!("{}", BS as char);
+                            print!("{}", BS as char);
                         }
-                    } else {
-                        let mut exit_code: i32 = 0;
-                        block_wait(pid, &mut exit_code);
-                    } 
-                    line.clear();
+                    }
                 }
-                print!("-> ~ ");
-            },
-            BS | DL => {
-                if !line.is_empty() {
-                    let ch = line.pop().unwrap();
-                    if ch.is_ascii() {
-                        print!("{}", BS as char);
-                        print!(" ");
-                        print!("{}", BS as char);
-                    } else {
-                        print!("{}", BS as char);
-                        print!("{}", BS as char);
-                        print!(" ");
-                        print!(" ");
-                        print!("{}", BS as char);
-                        print!("{}", BS as char);
+                _ => {
+                    if !ch.is_ascii_control() {
+                        print!("{}", ch);
+                        line.push(ch);
                     }
                 }
             }
-            _ => {
-                if !ch.is_ascii_control() {
-                    print!("{}", ch);
-                    line.push(ch as char);
-                }
-            }
+        } else {
+            print!("{}", ch);
+            line.push(ch);
         }
     }
 }
