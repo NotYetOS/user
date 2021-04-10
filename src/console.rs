@@ -33,8 +33,13 @@ macro_rules! println {
     }
 }
 
-pub fn get_byte() -> u8 {
-    let mut ch_byte = [0; 1];
-    super::read(STDIN, &mut ch_byte);
-    ch_byte[0]
+// utf8, 4 bytes
+pub fn getchar() -> char {
+    let mut bytes = [0; 4];
+    super::read(STDIN, &mut bytes);
+    let ch_value = u32::from_le_bytes(bytes);
+    match char::from_u32(ch_value) {
+        Some(ch) => ch,
+        None => 0 as char
+    }
 }
