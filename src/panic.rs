@@ -5,14 +5,15 @@ use crate::sys_exit;
 fn panic(info: &PanicInfo) -> ! {
     match info.location() {
         Some(location) => {
-            println!("[kernel] panicked at '{}', {}:{}:{}", 
+            println!(
+                "Panicked at '{}', {}:{}:{}", 
                 info.message().unwrap(),
                 location.file(), 
                 location.line(),
                 location.column()
             );
         }
-        None => println!("[kernel] panicked at '{}'", info.message().unwrap())
+        None => println!("Panicked at '{}'", info.message().unwrap())
     }
     sys_exit(-1)
 }

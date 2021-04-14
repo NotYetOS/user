@@ -1,5 +1,6 @@
 #![allow(unused)]
 
+const SYSCALL_DUP: usize = 24;
 const SYSCALL_OPEN: usize = 56;
 const SYSCALL_CLOSE: usize = 57;
 const SYSCALL_PIPE: usize = 59;
@@ -12,6 +13,9 @@ const SYSCALL_GETPID: usize = 172;
 const SYSCALL_FORK: usize = 220;
 const SYSCALL_EXEC: usize = 221;
 const SYSCALL_WAITPID: usize = 260;
+
+use alloc::vec::Vec;
+use alloc::string::String;
 
 fn syscall(id: usize, args: [usize; 3]) -> isize {
     let ret: isize;
@@ -28,6 +32,14 @@ fn syscall(id: usize, args: [usize; 3]) -> isize {
     }
 
     ret
+}
+
+pub fn sys_dup(fd: usize) -> isize {
+    syscall(SYSCALL_DUP, [fd, 0, 0])
+}
+
+pub fn sys_open(path: &str, len: usize, flags: u32) -> isize {
+    syscall(SYSCALL_OPEN, [path.as_ptr() as usize, len, flags as usize])
 }
 
 pub fn sys_close(fd: usize) -> isize {
@@ -67,10 +79,14 @@ pub fn sys_fork() -> isize {
     syscall(SYSCALL_FORK, [0; 3])
 }
 
-pub fn sys_exec(path: &str) -> isize {
-    syscall(SYSCALL_EXEC, [path.as_ptr() as usize, path.len(), 0])
+pub fn sys_exec(args: &str) -> isize {
+    syscall(SYSCALL_EXEC, [
+        args.as_ptr() as usize, 
+        args.len(),
+        0
+    ])
 }
 
-pub fn sys_waitpid(pid: isize, exit_code: *mut i32) -> isize {
-    syscall(SYSCALL_WAITPID, [pid as usize, exit_code as usize, 0])
+pub fn sys_waitpid(pid: isize, exit_code: &mut i32) -> isize {
+    syscall(SYSCALL_WAITPID, [pid as usize, exit_code as *mut i32 as usize, 0])
 }

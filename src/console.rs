@@ -36,10 +36,19 @@ macro_rules! println {
 // utf8, 4 bytes
 pub fn getchar() -> char {
     let mut bytes = [0; 4];
-    super::read(STDIN, &mut bytes);
-    let ch_value = u32::from_le_bytes(bytes);
-    match char::from_u32(ch_value) {
-        Some(ch) => ch,
-        None => 0 as char
-    }
+    
+    let len = loop {
+        let ret = super::read(
+            STDIN, 
+            &mut bytes
+        );
+        if ret != -1 && ret != -2 {
+            break ret as usize;
+        }
+    };
+
+    let ch = core::str::from_utf8(
+        &bytes[0..len]
+    ).unwrap();
+    ch.chars().nth(0).unwrap()
 }
