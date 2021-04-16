@@ -8,11 +8,10 @@ extern crate alloc;
 use alloc::string::String;
 use libuser::console::getchar;
 use libuser::{
-    _yield, 
     exec, 
     exit, 
     fork, 
-    waitpid,
+    block_waitpid,
 };
 
 const LF: u8 = 0x0au8;
@@ -47,7 +46,12 @@ fn main() -> ! {
                             }
                         } else {
                             let mut exit_code: i32 = 0;
-                            block_wait(pid, &mut exit_code);
+                            let pid = block_waitpid(pid, &mut exit_code);
+                            println!(
+                                "Process {} exited with code {}", 
+                                pid, 
+                                exit_code
+                            );
                         } 
                         line.clear();
                     }
@@ -82,21 +86,5 @@ fn main() -> ! {
             print!("{}", ch);
             line.push(ch);
         }
-    }
-}
-
-fn block_wait(pid: isize, exit_code: &mut i32) {
-    loop {
-        match waitpid(pid, exit_code) {
-            -2 => { _yield(); },
-            pid @ _ => { 
-                println!(
-                    "Process {} exited with code {}", 
-                    pid, 
-                    exit_code
-                );
-                break;
-            }
-        };
     }
 }

@@ -10,7 +10,7 @@ use libuser::{
     fork, 
     pipe, 
     read, 
-    wait, 
+    block_wait, 
     write
 };
 
@@ -37,7 +37,7 @@ pub fn main() -> i32 {
         close(pipe_fd[1]);
         let mut exit_code: i32 = 0;
         loop {
-            match wait(&mut exit_code) {
+            match block_wait(&mut exit_code) {
                 -2 => { _yield(); },
                  _ => { 
                     break;

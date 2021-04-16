@@ -5,8 +5,7 @@
 use libuser::{
     fork, 
     getpid, 
-    waitpid,
-    _yield,
+    block_waitpid,
 };
 
 #[macro_use]
@@ -22,14 +21,7 @@ fn main() -> i32 {
     } else {
         println!("it's parent process, pid is {}", getpid());
         let mut exit_code: i32 = 0;
-        loop {
-            match waitpid(pid, &mut exit_code) {
-                -2 => { _yield(); },
-                 _ => { 
-                    break;
-                }
-            };
-        }
+        block_waitpid(pid, &mut exit_code);
         assert_eq!(exit_code, 0);
         0
     }

@@ -3,18 +3,23 @@
 #![feature(asm)]
 
 use libuser::{
-    OpenFlags, 
-    open,
-    read,
+    OpenFlags,
+    open, 
+    read
 };
 
 #[macro_use]
 extern crate libuser;
 
 #[no_mangle]
-#[allow(unused)]
 fn main(argc: usize, argv: &[&str]) -> i32 {
     let mut buf = [0; 5120];
+    if argc < 2 { 
+        println!("please input arg");
+        println!("format:");
+        println!("cat <file-path>");
+        return 0;
+    }
     let fd = open(argv[1], OpenFlags::RDONLY);
     if fd == -1 {
         println!("cat: {}: No such file or directory", argv[1]);

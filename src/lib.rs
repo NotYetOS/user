@@ -69,6 +69,13 @@ pub extern "C" fn _start(argc: usize, argv: usize) -> ! {
     exit(main(argc, args.as_slice()))
 }
 
+#[macro_export]
+macro_rules! color_text {
+    ($text:expr, $color:expr) => {{
+        format_args!("\x1b[{}m{}\x1b[0m", $color, $text)
+    }};
+}
+
 #[no_mangle]
 #[linkage = "weak"]
 #[allow(unused)]
@@ -105,4 +112,29 @@ pub fn wait(exit_code: &mut i32) -> isize {
 }
 pub fn waitpid(pid: isize, exit_code: &mut i32) -> isize {
     sys_waitpid(pid, exit_code)
+}
+
+pub fn block_wait(exit_code: &mut i32) -> isize {
+    loop {
+        match sys_waitpid(-1, exit_code) {
+            -2 => { _yield(); }
+            exit_pid => return exit_pid,
+        }
+    }
+}
+
+pub fn block_waitpid(pid: isize, exit_code: &mut i32) -> isize {
+    loop {
+        match sys_waitpid(pid, exit_code) {
+            -2 => { _yield(); }
+            exit_pid => return exit_pid,
+        }
+    }
+}
+
+pub fn sleep(period_ms: usize) {
+    let start = sys_get_time();
+    while sys_get_time() < start + period_ms as isize {
+        sys_yield();
+    }
 }
