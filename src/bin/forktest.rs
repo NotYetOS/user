@@ -10,7 +10,7 @@ use libuser::{
     exit,
 };
 
-const MAX_CHILD: usize = 40;
+const MAX_CHILD: usize = 25;
 
 #[no_mangle]
 pub fn main() -> i32 {

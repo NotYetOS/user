@@ -4,9 +4,16 @@
 #[macro_use]
 extern crate libuser;
 
-use libuser::{fork, block_wait, getpid, exit, sleep, get_time_ms};
+use libuser::{
+    fork, 
+    block_wait, 
+    getpid, 
+    exit, 
+    sleep, 
+    get_time_ms
+};
 
-static NUM: usize = 30;
+static NUM: usize = 25;
 
 #[no_mangle]
 pub fn main() -> i32 {

@@ -6,8 +6,8 @@ extern crate libuser;
 
 static TESTS: &[&str] = &[
     "hello",
-    "sleep",
     "matrix",
+    "sleep",
     "pid",
     "forktest",
     "forktest2",
@@ -20,6 +20,8 @@ static TESTS: &[&str] = &[
     "power_5",
     "power_7",
     "fork",
+    "stack_overflow",
+    "i_can_eat_glass",
     "cat /tlnb/test",
     "fantastic_text"
 ];

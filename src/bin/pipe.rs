@@ -5,7 +5,6 @@
 extern crate libuser;
 
 use libuser::{
-    _yield, 
     close, 
     fork, 
     pipe, 
@@ -36,14 +35,7 @@ pub fn main() -> i32 {
         assert_eq!(write(pipe_fd[1], test_str.as_bytes()), test_str.len() as isize);
         close(pipe_fd[1]);
         let mut exit_code: i32 = 0;
-        loop {
-            match block_wait(&mut exit_code) {
-                -2 => { _yield(); },
-                 _ => { 
-                    break;
-                }
-            };
-        }
+        block_wait(&mut exit_code);
         assert_eq!(exit_code, 0);
         println!("pipetest passed!");
         0

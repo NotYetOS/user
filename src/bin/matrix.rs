@@ -4,9 +4,16 @@
 #[macro_use]
 extern crate libuser;
 
-use libuser::{fork, block_wait, _yield, exit, getpid, get_time_ms};
+use libuser::{
+    fork, 
+    block_wait, 
+    _yield, 
+    exit, 
+    getpid, 
+    get_time_ms
+};
 
-static NUM: usize = 35;
+static NUM: usize = 25;
 const N: usize = 10;
 static P: i32 = 10007;
 type Arr = [[i32; N]; N];

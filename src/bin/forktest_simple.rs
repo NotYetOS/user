@@ -4,7 +4,11 @@
 #[macro_use]
 extern crate libuser;
 
-use libuser::{fork, getpid, block_wait};
+use libuser::{
+    fork, 
+    getpid, 
+    block_wait
+};
 
 #[no_mangle]
 pub fn main() -> i32 {

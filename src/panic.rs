@@ -1,5 +1,5 @@
 use core::panic::PanicInfo;
-use crate::sys_exit;
+use super::exit;
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
@@ -15,5 +15,5 @@ fn panic(info: &PanicInfo) -> ! {
         }
         None => println!("Panicked at '{}'", info.message().unwrap())
     }
-    sys_exit(-1)
+    exit(-1)
 }
