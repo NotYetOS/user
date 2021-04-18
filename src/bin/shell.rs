@@ -5,9 +5,14 @@
 extern crate libuser;
 extern crate alloc;
 
+use alloc::vec::Vec;
 use alloc::string::String;
 use libuser::console::getchar;
 use libuser::{
+    OpenFlags,
+    dup,
+    open,
+    close,
     exec, 
     exit, 
     fork, 
@@ -31,31 +36,52 @@ fn main() -> ! {
             match ch as u8 {
                 LF | CR => {
                     println!("");
-
                     if line.eq("exit") {
                         exit(0);
                     }
     
                     if !line.is_empty() {
+                        let args = get_args(&line);
+
                         let pid = fork();
                         if pid == 0 {
-                            let ret = exec(&line);
+                            let tuple = args.iter()
+                                .enumerate()
+                                .find(|(_, &value)| value == ">");
+                            
+                            let ret = if tuple.is_some() {
+                                let (idx, _) = tuple.unwrap();
+                                let fd = open(
+                                    &args[idx + 1], 
+                                    OpenFlags::WRONLY | OpenFlags::CREATE
+                                );
+                                close(1);
+                                if fd < 0 {
+                                    exit(-1);
+                                }
+                                dup(fd as usize);
+
+                                let command = args[0..idx].join(" ");
+                                exec(&command)
+                            } else {
+                                exec(&line)
+                            };
+
                             if ret == -1 {
                                 println!("{}: command not found", line);
                                 exit(-1);
                             }
                         } else {
-                            let mut exit_code: i32 = 0;
-                            let pid = block_waitpid(pid, &mut exit_code);
-                            println!(
-                                "Process {} exited with code {}", 
-                                pid, 
-                                exit_code
-                            );
+                            let mut _exit_code: i32 = 0;
+                            block_waitpid(pid, &mut _exit_code);
+                            // println!(
+                            //     "Process {} exited with code {}", 
+                            //     pid, 
+                            //     exit_code
+                            // );
                         } 
                         line.clear();
                     }
-
                     print!("-> ~ ");
                 },
                 BS | DL => {
@@ -87,4 +113,11 @@ fn main() -> ! {
             line.push(ch);
         }
     }
+}
+
+fn get_args(args: &str) -> Vec<&str> {
+    args.split(" ")
+        .filter(|arg| !arg.is_empty())
+        .map(|arg| arg)
+        .collect()
 }
